@@ -28,11 +28,14 @@ def populate_table(books):
     """
     con = sqlite3.connect("ebookstore.db")
     cur = con.cursor()
-    cur.executemany(
-        """INSERT INTO books (id, Title, Author, Qty) VALUES(?,?,?,?)""", books)
+    cur.execute("SELECT * FROM books")
+    res = cur.fetchone()
+    if res is None:
+        cur.executemany(
+            """INSERT INTO books (id, Title, Author, Qty) VALUES(?,?,?,?)""", books)
 
-    con.commit()
-    con.close()
+        con.commit()
+        con.close()
 
 
 def enter_book():
@@ -130,7 +133,9 @@ def search_books():
         "Enter your search ")
     res = cur.execute(
         f"""SELECT * FROM books WHERE title LIKE "%{search_query}%" OR author LIKE "%{search_query}%";""")
-    print(res.fetchall())
+    result = res.fetchall()
+    print()
+    print(tabulate(result, headers=['id', 'Title', 'Author', 'Qty']))
 
 
 # Secret function option to allow for testing the program
